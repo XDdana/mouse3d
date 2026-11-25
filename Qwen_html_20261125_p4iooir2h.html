@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three Models — простые 3D-модели с анимацией</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========================================
+           CSS Variables & Reset
+           ======================================== */
+        :root {
+            --background-color: #0a0a0f;
+            --surface-color: #13131f;
+            --text-color: #ffffff;
+            --text-muted: #9ca3af;
+            --accent-color: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --glass-border: rgba(139, 92, 246, 0.3);
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           Typography
+           ======================================== */
+        h1, h2, h3 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .section-kicker {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-kicker::before {
+            content: '';
+            width: 2rem;
+            height: 1px;
+            background: var(--accent-color);
+        }
+
+        /* ========================================
+           Layout
+           ======================================== */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-pad {
+            padding: 6rem 0;
+        }
+
+        /* ========================================
+           Header
+           ======================================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .logo-main {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--text-color);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           Hero Section
+           ======================================== */
+        .hero {
+            position: relative;
+            padding: 8rem 2rem 4rem;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-glow {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-glow:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-color);
+            padding: 0.875rem 1.75rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 3rem;
+            max-width: 400px;
+        }
+
+        .stat-card {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .hero-visual {
+            position: relative;
+            aspect-ratio: 1;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .canvas-frame {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1;
+        }
+
+        .canvas-frame canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .canvas-label {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-muted);
+        }
+
+        /* ========================================
+           Institution Section
+           ======================================== */
+        .institution-section {
+            background: var(--surface-color);
+        }
+
+        .institution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .institution-image {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .institution-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .institution-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .institution-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .institution-year {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* ========================================
+           Specialties Section
+           ======================================== */
+        .specialties-section {
+            background: var(--background-color);
+        }
+
+        .specialties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .specialty-card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .specialty-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+        }
+
+        .specialty-code {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .specialty-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .specialty-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .specialty-details {
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1rem;
+        }
+
+        .specialty-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .specialty-detail-label {
+            color: var(--text-muted);
+        }
+
+        .specialty-detail-value {
+            font-weight: 600;
+        }
+
+        /* ========================================
+           Models Section
+           ======================================== */
+        .models-section {
+            background: var(--background-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-top: 1rem;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .model-card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .model-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+        }
+
+        .model-art {
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent-color);
+        }
+
+        .model-content {
+            padding: 1.5rem;
+        }
+
+        .model-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .chip {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .chip-accent {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .model-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .model-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-icon {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        /* ========================================
+           Tools Section
+           ======================================== */
+        .tools-section {
+            background: var(--surface-color);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .tool-card {
+            background: var(--background-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .tool-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           CTA Section
+           ======================================== */
+        .cta-section {
+            background: var(--background-color);
+        }
+
+        .cta-box {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 3rem;
+        }
+
+        .cta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step-item {
+            background: var(--background-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ========================================
+           Footer
+           ======================================== */
+        footer {
+            background: var(--background-color);
+            border-top: 1px solid var(--glass-border);
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .footer-column h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            margin-bottom: 1rem;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-column a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent-color);
+        }
+
+        /* ========================================
+           Responsive
+           ======================================== */
+        @media (max-width: 1024px) {
+            .hero-grid,
+            .institution-grid,
+            .cta-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-header h2,
+            .institution-content h2,
+            .cta-content h2 {
+                font-size: 2rem;
+            }
+
+            .models-grid,
+            .specialties-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-main">THREE MODELS</div>
+                <div class="logo-sub">3D · ANIMATION</div>
+            </div>
+            <nav>
+                <a href="index.html">Главная</a>
+                <a href="library.html">Библиотека</a>
+                <a href="editor.html">Редактор</a>
+                <a href="upload.html" class="btn-primary">Загрузить модель</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <span class="section-kicker">Простые 3D-модели</span>
+                    <h1>Анимированные 3D-модели — скачивай, меняй, оживляй.</h1>
+                    <p>Загружайте свои модели в GLB, редактируйте их прямо в браузере — масштаб, клонирование, срез, отверстия — и записывайте анимацию в MP4.</p>
+                    <div class="hero-buttons">
+                        <a href="library.html" class="btn-glow">
+                            <i class="fa-solid fa-cubes"></i>
+                            Открыть библиотеку
+                        </a>
+                        <a href="editor.html" class="btn-ghost">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Редактор моделей
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Модели</div>
+                            <div class="stat-value">GLB</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Правка</div>
+                            <div class="stat-value">6</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Видео</div>
+                            <div class="stat-value">MP4</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="canvas-frame">
+                        <canvas id="heroCanvas" aria-label="Вращающаяся 3D-модель узла в фиолетовом свете"></canvas>
+                        <div class="canvas-label">
+                            <span>Живая сцена</span>
+                            <span><i class="fa-solid fa-circle-nodes"></i> three.js</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Institution Section -->
+        <section class="institution-section section-pad">
+            <div class="container">
+                <div class="institution-grid">
+                    <div class="institution-image">
+                        <img src="./assets/ВАГПК.webp" alt="Логотип ВАГПК">
+                    </div>
+                    <div class="institution-content">
+                        <span class="section-kicker">Учреждение</span>
+                        <h2>Волгоградский аграрно-промышленный колледж</h2>
+                        <p>Образовательное учреждение среднего профессионального образования, готовящее специалистов для агропромышленного комплекса региона.</p>
+                        <p>Колледж оснащен современными лабораториями и мастерскими, где студенты получают практические навыки работы с передовыми технологиями.</p>
+                        <span class="institution-year">
+                            <i class="fa-solid fa-calendar"></i> Основан в 1943 году
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Specialties Section -->
+        <section class="specialties-section section-pad">
+            <div class="container">
+                <div>
+                    <span class="section-kicker">Образовательные программы</span>
+                    <h2>Специальности</h2>
+                </div>
+                <div class="specialties-grid">
+                    <article class="specialty-card">
+                        <span class="specialty-code">09.02.07</span>
+                        <h3>ИСП-25</h3>
+                        <p>Информационные системы и программирование</p>
+                        <div class="specialty-details">
+                            <div class="specialty-detail-item">
+                                <span class="specialty-detail-label">Квалификация:</span>
+                                <span class="specialty-detail-value">Разработчик веб и мультимедийных приложений</span>
+                            </div>
+                            <div class="specialty-detail-item">
+                                <span class="specialty-detail-label">Срок обучения:</span>
+                                <span class="specialty-detail-value">3 года 10 месяцев</span>
+                            </div>
+                            <div class="specialty-detail-item">
+                                <span class="specialty-detail-label">Форма обучения:</span>
+                                <span class="specialty-detail-value">Очная</span>
+                            </div>
+                            <div class="specialty-detail-item">
+                                <span class="specialty-detail-label">Набор 2025:</span>
+                                <span class="specialty-detail-value">25 человек</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Models Section -->
+        <section class="models-section section-pad">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <span class="section-kicker">Библиотека</span>
+                        <h2>Готовые модели с анимацией — в один клик</h2>
+                    </div>
+                    <a href="library.html" class="btn-ghost">
+                        Вся библиотека
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="models-grid">
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-paw"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Животные</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Попугай</h3>
+                            <p>Небольшая птица с цикличной анимацией полёта: анимация замыкается без рывков и хорошо смотрится в коротких видео.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=parrot" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-paw"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Животные</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Лошадь</h3>
+                            <p>Галоп лошади с морфинг-анимацией — классика для проверки плавности и записи референсного видео.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=horse" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-paw"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Животные</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Фламинго</h3>
+                            <p>Лёгкая модель птицы с плавной анимацией взмаха крыльев. Низкая нагрузка на сцену — удобно для превью и фонов.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=flamingo" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Персонажи</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Xbot</h3>
+                            <p>Базовый человекоподобный риг с клипами ходьбы и бега. Удобная тестовая модель для проверки скелетной анимации.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=xbot" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Персонажи</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Робот Экспресс</h3>
+                            <p>Дружелюбный робот с набором выразительных анимаций: приветствие, танец и ходьба. Хорошо смотрится в вертикальном видео.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=robot" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="model-card">
+                        <div class="model-art">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div class="model-content">
+                            <div class="model-tags">
+                                <span class="chip">Персонажи</span>
+                                <span class="chip chip-accent">
+                                    <i class="fa-solid fa-play"></i> Анимация
+                                </span>
+                            </div>
+                            <h3>Солдат</h3>
+                            <p>Анимированный персонаж с готовым набором движений: стойка, ходьба и бег. Отлично подходит для тестов ретаргета и записи видео.</p>
+                            <div class="model-actions">
+                                <a href="editor.html?model=soldier" class="btn-primary btn-sm">В редакторе</a>
+                                <button class="btn-icon">
+                                    <i class="fa-solid fa-download"></i> GLB
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="tools-section section-pad">
+            <div class="container">
+                <div>
+                    <span class="section-kicker">Встроенный редактор</span>
+                    <h2>Мастерская прямо в браузере — без установки программ</h2>
+                    <p style="color: var(--text-muted); margin-top: 1rem; max-width: 600px;">
+                        Откройте любую модель из библиотеки или загрузите свою. Все инструменты работают в реальном времени, а результат можно сохранить видеофайлом.
+                    </p>
+                </div>
+                <div class="tools-grid">
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        </div>
+                        <h3>Масштаб</h3>
+                        <p>Увеличивайте и уменьшайте модель ползунком — от 0,2× до 3×.</p>
+                    </article>
+
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-clone"></i>
+                        </div>
+                        <h3>Клонирование</h3>
+                        <p>Дублируйте выбранную деталь и расставляйте копии по сцене.</p>
+                    </article>
+
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-scissors"></i>
+                        </div>
+                        <h3>Срез</h3>
+                        <p>Отрезайте часть модели плоскостью по любой оси — в реальном времени.</p>
+                    </article>
+
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-circle-notch"></i>
+                        </div>
+                        <h3>Отверстия</h3>
+                        <p>Включите «Дрель» и кликните по поверхности — появится отверстие.</p>
+                    </article>
+
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                        <h3>Материал</h3>
+                        <p>Меняйте цвет любой детали на фиолетовую палитру сайта.</p>
+                    </article>
+
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-video"></i>
+                        </div>
+                        <h3>Экспорт MP4</h3>
+                        <p>Записывайте анимацию модели в видео прямо из сцены.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section section-pad">
+            <div class="container">
+                <div class="cta-box">
+                    <div class="cta-grid">
+                        <div class="cta-content">
+                            <span class="section-kicker">Как это работает</span>
+                            <h2>Загрузите модель — остальное сделает мастерская</h2>
+                            <p>Файл хранится в библиотеке: его можно скачать в любой момент, открыть в редакторе или записать анимацию в видео.</p>
+                            <a href="upload.html" class="btn-glow">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                Загрузить модель
+                            </a>
+                        </div>
+                        <div class="steps-list">
+                            <div class="step-item">
+                                <div class="step-number">01</div>
+                                <div class="step-content">
+                                    <h3>Загрузите .glb</h3>
+                                    <p>Один файл — внутри уже есть геометрия, текстуры и анимация.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">02</div>
+                                <div class="step-content">
+                                    <h3>Отредактируйте</h3>
+                                    <p>Масштаб, клонирование, срез и отверстия — всё в браузере.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">03</div>
+                                <div class="step-content">
+                                    <h3>Скачайте результат</h3>
+                                    <p>Модель в GLB или видео с анимацией в MP4.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-main">THREE MODELS</div>
+                    <div class="logo-sub">3D · ANIMATION</div>
+                </div>
+                <p>Библиотека простых анимированных 3D-моделей: скачивайте в GLB, правьте в браузере и записывайте видео в MP4.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Разделы</h4>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="library.html">Библиотека моделей</a></li>
+                    <li><a href="editor.html">3D-мастерская</a></li>
+                    <li><a href="upload.html">Загрузка модели</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Форматы</h4>
+                <ul>
+                    <li><a href="#">Модели: GLB / glTF</a></li>
+                    <li><a href="#">Анимация: встроенные клипы</a></li>
+                    <li><a href="#">Видео: MP4 (WebM в Safari)</a></li>
+                    <li><a href="#">Работает в браузере</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
