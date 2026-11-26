@@ -311,30 +311,35 @@
         /* ===== ANIMATION TOGGLE BUTTON ===== */
         .anim-toggle-btn {
             background: var(--accent);
-            color: #fff;
+            color: #1e1b4b;
             border: none;
             padding: 10px 24px;
             border-radius: 10px;
             font-size: 0.9em;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.25s;
             font-family: 'Inter', sans-serif;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+            letter-spacing: 0.3px;
         }
-
+        
         .anim-toggle-btn:hover {
             background: var(--accent-light);
+            color: #0f1117;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(99,102,241,0.4);
         }
-
+        
         .anim-toggle-btn.active {
             background: #ef4444;
+            color: #fff;
+            text-shadow: none;
         }
-
+        
         .anim-toggle-btn.active:hover {
             background: #f87171;
             box-shadow: 0 6px 20px rgba(239,68,68,0.4);
