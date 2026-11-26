@@ -1,0 +1,194 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+
+<script>
+    (function() {
+        const container = document.getElementById('canvas-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x12141e);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(3, 3, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.rotateSpeed = 0.8;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.minDistance = 1;
+        controls.maxDistance = 15;
+
+        // Освещение — усиленное, чтобы модель точно была видна
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(5, 10, 7);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const directionalLight2 = new THREE.DirectionalLight(0x818cf8, 0.5);
+        directionalLight2.position.set(-5, 5, -5);
+        scene.add(directionalLight2);
+
+        const directionalLight3 = new THREE.DirectionalLight(0xa78bfa, 0.3);
+        directionalLight3.position.set(0, -3, 5);
+        scene.add(directionalLight3);
+
+        const pointLight = new THREE.PointLight(0x6366f1, 0.5, 20);
+        pointLight.position.set(0, 5, 0);
+        scene.add(pointLight);
+
+        // Пол
+        const groundGeometry = new THREE.PlaneGeometry(20, 20);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1a1d2e,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -1.5;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        const gridHelper = new THREE.GridHelper(10, 20, 0x2a2d3e, 0x1e2030);
+        gridHelper.position.y = -1.49;
+        scene.add(gridHelper);
+
+        // Материал для модели
+        const mouseMaterial = new THREE.MeshPhongMaterial({
+            color: 0x6366f1,
+            emissive: 0x1e1b4b,
+            specular: 0xc7d2fe,
+            shininess: 80,
+            side: THREE.DoubleSide,
+            flatShading: false
+        });
+
+        const loader = new THREE.OBJLoader();
+        loader.load(
+            'img/dz5.obj',
+            function(object) {
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 2.5 / maxDim;
+                object.scale.set(scale, scale, scale);
+
+                object.position.sub(center.multiplyScalar(scale));
+                object.position.y += 0.3;
+
+                // === ГЛАВНОЕ ИСПРАВЛЕНИЕ ===
+                object.traverse(function(child) {
+                    if (child.isMesh) {
+                        // Пересчитываем нормали — это.fixит белый каркас
+                        if (child.geometry) {
+                            child.geometry.computeVertexNormals();
+                            child.geometry.computeFaceNormals();
+                        }
+
+                        // Применяем нормальный материал (Phong лучше работает без нормалей в файле)
+                        child.material = mouseMaterial.clone();
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(object);
+                loadingOverlay.style.display = 'none';
+            },
+            function(xhr) {
+                if (xhr.lengthComputable) {
+                    const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                    loadingOverlay.querySelector('p').textContent = 'Загрузка: ' + percent + '%';
+                }
+            },
+            function(error) {
+                console.error('Ошибка загрузки модели:', error);
+                loadingOverlay.querySelector('p').textContent = 'Ошибка загрузки. Проверьте img/dz5.obj';
+                loadingOverlay.querySelector('.loader').style.display = 'none';
+                createFallbackMouse();
+            }
+        );
+
+        function createFallbackMouse() {
+            const group = new THREE.Group();
+
+            const bodyGeo = new THREE.SphereGeometry(1, 32, 32);
+            bodyGeo.scale(1, 0.5, 1.5);
+            const bodyMat = new THREE.MeshPhongMaterial({
+                color: 0x6366f1,
+                emissive: 0x1e1b4b,
+                specular: 0xc7d2fe,
+                shininess: 80
+            });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.castShadow = true;
+            group.add(body);
+
+            const btnGeo = new THREE.SphereGeometry(0.45, 16, 16);
+            btnGeo.scale(1, 0.3, 1);
+            const btnMat = new THREE.MeshPhongMaterial({
+                color: 0x818cf8,
+                specular: 0xffffff,
+                shininess: 100
+            });
+            const leftBtn = new THREE.Mesh(btnGeo, btnMat);
+            leftBtn.position.set(-0.35, 0.35, -0.5);
+            group.add(leftBtn);
+
+            const rightBtn = new THREE.Mesh(btnGeo, btnMat);
+            rightBtn.position.set(0.35, 0.35, -0.5);
+            group.add(rightBtn);
+
+            const wheelGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
+            const wheelMat = new THREE.MeshPhongMaterial({
+                color: 0x312e81,
+                specular: 0x818cf8,
+                shininess: 60
+            });
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.rotation.x = Math.PI / 2;
+            wheel.position.set(0, 0.4, -0.3);
+            group.add(wheel);
+
+            const cableGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
+            const cableMat = new THREE.MeshPhongMaterial({ color: 0x475569 });
+            const cable = new THREE.Mesh(cableGeo, cableMat);
+            cable.position.set(0, 0.1, 1.2);
+            cable.rotation.x = Math.PI / 4;
+            group.add(cable);
+
+            group.position.y = 0.3;
+            scene.add(group);
+            loadingOverlay.style.display = 'none';
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', function() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    })();
+</script>
