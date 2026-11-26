@@ -1,6 +1,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
     (function() {
@@ -18,6 +18,9 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -29,8 +32,8 @@
         controls.minDistance = 1;
         controls.maxDistance = 15;
 
-        // Освещение — усиленное, чтобы модель точно была видна
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        // Освещение
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -38,7 +41,7 @@
         directionalLight.castShadow = true;
         scene.add(directionalLight);
 
-        const directionalLight2 = new THREE.DirectionalLight(0x818cf8, 0.5);
+        const directionalLight2 = new THREE.DirectionalLight(0x818cf8, 0.4);
         directionalLight2.position.set(-5, 5, -5);
         scene.add(directionalLight2);
 
@@ -67,48 +70,53 @@
         gridHelper.position.y = -1.49;
         scene.add(gridHelper);
 
-        // Материал для модели
-        const mouseMaterial = new THREE.MeshPhongMaterial({
+        // Материал для перезаписи (если нужно)
+        const mouseMaterial = new THREE.MeshStandardMaterial({
             color: 0x6366f1,
-            emissive: 0x1e1b4b,
-            specular: 0xc7d2fe,
-            shininess: 80,
-            side: THREE.DoubleSide,
-            flatShading: false
+            roughness: 0.3,
+            metalness: 0.6,
+            side: THREE.DoubleSide
         });
 
-        const loader = new THREE.OBJLoader();
+        // === GLTF LOADER ===
+        const loader = new THREE.GLTFLoader();
         loader.load(
-            'img/dz5.obj',
-            function(object) {
-                const box = new THREE.Box3().setFromObject(object);
+            'img/dz5.glb',
+            function(gltf) {
+                const model = gltf.scene;
+
+                // Центрирование и масштабирование
+                const box = new THREE.Box3().setFromObject(model);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
 
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 2.5 / maxDim;
-                object.scale.set(scale, scale, scale);
+                model.scale.set(scale, scale, scale);
 
-                object.position.sub(center.multiplyScalar(scale));
-                object.position.y += 0.3;
+                model.position.sub(center.multiplyScalar(scale));
+                model.position.y += 0.3;
 
-                // === ГЛАВНОЕ ИСПРАВЛЕНИЕ ===
-                object.traverse(function(child) {
+                // Проходим по всем мешам модели
+                model.traverse(function(child) {
                     if (child.isMesh) {
-                        // Пересчитываем нормали — это.fixит белый каркас
+                        // Пересчёт нормалей (на всякий случай)
                         if (child.geometry) {
                             child.geometry.computeVertexNormals();
-                            child.geometry.computeFaceNormals();
                         }
 
-                        // Применяем нормальный материал (Phong лучше работает без нормалей в файле)
-                        child.material = mouseMaterial.clone();
+                        // Включаем тени
                         child.castShadow = true;
                         child.receiveShadow = true;
+
+                        // ОПЦИОНАЛЬНО: раскомментируй строку ниже,
+                        // если хочешь принудительно применить свой материал
+                        // вместо того, что зашит в glb
+                        // child.material = mouseMaterial.clone();
                     }
                 });
 
-                scene.add(object);
+                scene.add(model);
                 loadingOverlay.style.display = 'none';
             },
             function(xhr) {
@@ -119,22 +127,22 @@
             },
             function(error) {
                 console.error('Ошибка загрузки модели:', error);
-                loadingOverlay.querySelector('p').textContent = 'Ошибка загрузки. Проверьте img/dz5.obj';
+                loadingOverlay.querySelector('p').textContent = 'Ошибка загрузки. Проверьте img/dz5.glb';
                 loadingOverlay.querySelector('.loader').style.display = 'none';
                 createFallbackMouse();
             }
         );
 
+        // Fallback-модель если glb не загрузился
         function createFallbackMouse() {
             const group = new THREE.Group();
 
             const bodyGeo = new THREE.SphereGeometry(1, 32, 32);
             bodyGeo.scale(1, 0.5, 1.5);
-            const bodyMat = new THREE.MeshPhongMaterial({
+            const bodyMat = new THREE.MeshStandardMaterial({
                 color: 0x6366f1,
-                emissive: 0x1e1b4b,
-                specular: 0xc7d2fe,
-                shininess: 80
+                roughness: 0.3,
+                metalness: 0.6
             });
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             body.castShadow = true;
@@ -142,10 +150,10 @@
 
             const btnGeo = new THREE.SphereGeometry(0.45, 16, 16);
             btnGeo.scale(1, 0.3, 1);
-            const btnMat = new THREE.MeshPhongMaterial({
+            const btnMat = new THREE.MeshStandardMaterial({
                 color: 0x818cf8,
-                specular: 0xffffff,
-                shininess: 100
+                roughness: 0.2,
+                metalness: 0.7
             });
             const leftBtn = new THREE.Mesh(btnGeo, btnMat);
             leftBtn.position.set(-0.35, 0.35, -0.5);
@@ -156,10 +164,10 @@
             group.add(rightBtn);
 
             const wheelGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
-            const wheelMat = new THREE.MeshPhongMaterial({
+            const wheelMat = new THREE.MeshStandardMaterial({
                 color: 0x312e81,
-                specular: 0x818cf8,
-                shininess: 60
+                roughness: 0.5,
+                metalness: 0.3
             });
             const wheel = new THREE.Mesh(wheelGeo, wheelMat);
             wheel.rotation.x = Math.PI / 2;
@@ -167,7 +175,7 @@
             group.add(wheel);
 
             const cableGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
-            const cableMat = new THREE.MeshPhongMaterial({ color: 0x475569 });
+            const cableMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
             const cable = new THREE.Mesh(cableGeo, cableMat);
             cable.position.set(0, 0.1, 1.2);
             cable.rotation.x = Math.PI / 4;
