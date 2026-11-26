@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИСП-25 09.02.07 — Морозов Кирилл Артемович</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f1117;
+            --bg-card: #1a1d27;
+            --bg-card-hover: #22263a;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: rgba(255,255,255,0.06);
+            --radius: 16px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -300px;
+            left: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: rgba(15, 17, 23, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-left img {
+            height: 42px;
+            width: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .header-title {
+            font-size: 1.15em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-right img {
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #fff;
+            padding: 4px;
+        }
+
+        .header-author {
+            text-align: right;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .header-author small {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ===== NAV ===== */
+        nav {
+            background: rgba(15, 17, 23, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 40px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 74px;
+            z-index: 999;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.88em;
+            padding: 8px 20px;
+            border-radius: 10px;
+            transition: all 0.25s;
+        }
+
+        nav a:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: var(--accent-light);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border: 1px solid rgba(99,102,241,0.3);
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #818cf8 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero .specialty {
+            font-size: 1.5em;
+            color: var(--accent-light);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .hero .specialty-full {
+            font-size: 1.15em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero .author {
+            font-size: 1.05em;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .hero .college {
+            font-size: 0.95em;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ===== SECTIONS ===== */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 40px;
+            color: var(--text);
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, var(--accent-light), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== 3D VIEWER ===== */
+        .viewer-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #12141e, #1a1d2e);
+            position: relative;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        #canvas-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .viewer-controls {
+            text-align: center;
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .viewer-controls span {
+            background: rgba(99,102,241,0.1);
+            color: var(--accent-light);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.82em;
+            font-weight: 600;
+            border: 1px solid rgba(99,102,241,0.15);
+        }
+
+        /* ===== INFO CARDS ===== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99,102,241,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+
+        .info-card h3 {
+            color: var(--accent-light);
+            margin-bottom: 14px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .info-card p, .info-card li {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.93em;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+        }
+
+        .info-card ul li {
+            margin-bottom: 6px;
+        }
+
+        .info-card ul li strong {
+            color: var(--text);
+        }
+
+        /* ===== SUBJECTS GRID ===== */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .subject-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 22px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .subject-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99,102,241,0.3);
+            transform: translateY(-3px);
+        }
+
+        .subject-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--accent-glow);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.4em;
+            border: 1px solid rgba(99,102,241,0.2);
+        }
+
+        .subject-card h4 {
+            color: var(--text);
+            font-size: 0.92em;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* ===== GALLERY ===== */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .gallery-item:hover {
+            border-color: rgba(99,102,241,0.3);
+            transform: translateY(-3px);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item .caption {
+            padding: 16px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.95em;
+        }
+
+        /* ===== PURPOSE ===== */
+        .purpose-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .purpose-section h3 {
+            color: var(--accent-light);
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .purpose-section p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1em;
+        }
+
+        .purpose-section strong {
+            color: var(--text);
+        }
+
+        .purpose-section ul {
+            margin-top: 12px;
+            padding-left: 24px;
+            color: var(--text-muted);
+            line-height: 2;
+        }
+
+        .purpose-section ul li strong {
+            color: var(--text);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== LOADING ===== */
+        #loading-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(18, 20, 30, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 14px;
+        }
+
+        .loader {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(99,102,241,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #loading-overlay p {
+            margin-top: 14px;
+            color: var(--accent-light);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 14px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .hero {
+                padding: 50px 20px 40px;
+            }
+
+            #canvas-container {
+                height: 320px;
+            }
+
+            nav {
+                gap: 6px;
+                padding: 10px 15px;
+                top: 110px;
+            }
+
+            nav a {
+                font-size: 0.8em;
+                padding: 6px 14px;
+            }
+
+            .section-title {
+                font-size: 1.5em;
+            }
+
+            .purpose-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <img src="img/logo.png" alt="Логотип сайта">
+            <div class="header-title">ИСП-25 | 09.02.07</div>
+        </div>
+        <div class="header-right">
+            <div class="header-author">
+                Морозов Кирилл Артемович<br>
+                <small>ВАГПК, г. Воркута</small>
+            </div>
+            <img src="img/vagpk-logo.png" alt="Логотип ВАГПК">
+        </div>
+    </header>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#home">Главная</a>
+        <a href="#model">3D Модель</a>
+        <a href="#info">О мышках</a>
+        <a href="#subjects">Дисциплины</a>
+        <a href="#gallery">Галерея</a>
+        <a href="#purpose">Назначение</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero" id="home">
+        <div class="hero-badge">Специальность 09.02.07</div>
+        <h1>Информационные системы<br>и программирование</h1>
+        <div class="specialty">ИСП-25</div>
+        <div class="specialty-full">Воркутинский агропромышленный колледж (ВАГПК), г. Воркута</div>
+        <div class="author">Морозов Кирилл Артемович</div>
+    </div>
+
+    <!-- 3D MODEL SECTION -->
+    <section id="model">
+        <h2 class="section-title"><span>3D Модель</span> — Компьютерная мышка</h2>
+        <div class="viewer-container">
+            <div id="canvas-container">
+                <div id="loading-overlay">
+                    <div class="loader"></div>
+                    <p>Загрузка 3D модели...</p>
+                </div>
+            </div>
+            <div class="viewer-controls">
+                <span>🖱️ ЛКМ — вращение</span>
+                <span>🔍 Колёсико — масштаб</span>
+                <span>✋ ПКМ — перемещение</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO ABOUT MICE -->
+    <section id="info">
+        <h2 class="section-title"><span>Компьютерная мышь</span> — полное описание</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🖱️ Что такое компьютерная мышь?</h3>
+                <p>Компьютерная мышь — это устройство ввода информации, которое позволяет управлять курсором на экране компьютера и взаимодействовать с графическим интерфейсом операционной системы. Мышь является одним из основных устройств ввода наряду с клавиатурой.</p>
+            </div>
+            <div class="info-card">
+                <h3>📜 История создания</h3>
+                <p>Компьютерная мышь была изобретена Дугласом Энгельбартом в 1963 году в Стэнфордском исследовательском институте. Первый прототип был деревянным с двумя колёсиками. Название «мышь» произошло из-за сходства устройства с грызуном — провод напоминал хвост.</p>
+            </div>
+            <div class="info-card">
+                <h3>⚙️ Типы мышек</h3>
+                <ul>
+                    <li><strong>Механические</strong> — с резиновым шариком внутри</li>
+                    <li><strong>Оптические</strong> — используют светодиод и сенсор</li>
+                    <li><strong>Лазерные</strong> — высокая точность отслеживания</li>
+                    <li><strong>Беспроводные</strong> — Bluetooth или USB-радиоканал</li>
+                    <li><strong>Игровые</strong> — повышенная точность и DPI</li>
+                    <li><strong>Вертикальные</strong> — эргономичная форма</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🔧 Основные характеристики</h3>
+                <ul>
+                    <li><strong>DPI (CPI)</strong> — чувствительность сенсора (800–16000+)</li>
+                    <li><strong>Частота опроса</strong> — 125–8000 Гц</li>
+                    <li><strong>Количество кнопок</strong> — от 2 до 20+</li>
+                    <li><strong>Тип подключения</strong> — USB, Bluetooth, 2.4 ГГц</li>
+                    <li><strong>Вес</strong> — от 50 до 150 грамм</li>
+                    <li><strong>Подсветка</strong> — RGB или монохромная</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🎮 Применение</h3>
+                <ul>
+                    <li>Работа с офисными программами</li>
+                    <li>Графический дизайн и монтаж видео</li>
+                    <li>Компьютерные игры</li>
+                    <li>3D-моделирование и CAD</li>
+                    <li>Веб-браузинг и навигация</li>
+                    <li>Программирование</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🏆 Производители</h3>
+                <ul>
+                    <li><strong>Logitech</strong> — лидер рынка</li>
+                    <li><strong>Razer</strong> — игровые мыши</li>
+                    <li><strong>SteelSeries</strong> — киберспорт</li>
+                    <li><strong>HyperX</strong> — игровая периферия</li>
+                    <li><strong>Apple</strong> — Magic Mouse</li>
+                    <li><strong>Microsoft</strong> — офисные решения</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUBJECTS -->
+    <section id="subjects">
+        <h2 class="section-title"><span>Изучаемые дисциплины</span></h2>
+        <div class="subjects-grid">
+            <div class="subject-card">
+                <div class="subject-icon">⟨/⟩</div>
+                <h4>Основы алгоритмизации и программирования</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🗄️</div>
+                <h4>Основы проектирования баз данных</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">💻</div>
+                <h4>Разработка кода информационных систем</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🐛</div>
+                <h4>Тестирование информационных систем</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">📋</div>
+                <h4>Управление проектами</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🖥️</div>
+                <h4>Внедрение и поддержка компьютерных систем</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🛡️</div>
+                <h4>Обеспечение качества функционирования систем</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🌐</div>
+                <h4>Проектирование и разработка веб-приложений</h4>
+            </div>
+            <div class="subject-card">
+                <div class="subject-icon">🎨</div>
+                <h4>Графический дизайн и мультимедиа</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery">
+        <h2 class="section-title"><span>Фотографии</span> специальности</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="img/photo1.jpg" alt="Фото специальности 1">
+                <div class="caption">Учебный процесс</div>
+            </div>
+            <div class="gallery-item">
+                <img src="img/photo2.jpg" alt="Фото специальности 2">
+                <div class="caption">Лабораторные работы</div>
+            </div>
+            <div class="gallery-item">
+                <img src="img/photo3.jpg" alt="Фото специальности 3">
+                <div class="caption">Практика</div>
+            </div>
+            <div class="gallery-item">
+                <img src="img/mouse-photo.jpg" alt="Фото 3D модели">
+                <div class="caption">3D модель компьютерной мышки</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PURPOSE -->
+    <section id="purpose">
+        <h2 class="section-title"><span>Назначение</span> 3D модели</h2>
+        <div class="purpose-section">
+            <h3>🖱️ Компьютерная мышка — 3D модель</h3>
+            <p>
+                Данная 3D модель компьютерной мышки была создана в рамках учебной практики по специальности
+                <strong>09.02.07 «Информационные системы и программирование»</strong> (ИСП-25) в Воркутинском агропромышленном колледже (ВАГПК).
+            </p>
+            <br>
+            <p><strong>Назначение модели:</strong></p>
+            <ul>
+                <li>Визуализация устройства компьютерной мыши в трёхмерном пространстве</li>
+                <li>Изучение формы и эргономики корпуса периферийного устройства</li>
+                <li>Демонстрация навыков 3D-моделирования в рамках специальности</li>
+                <li>Использование в образовательных и презентационных целях</li>
+                <li>Интерактивный просмотр модели с возможностью вращения и масштабирования</li>
+                <li>Подготовка портфолио студента по направлению информационных систем</li>
+            </ul>
+            <br>
+            <p>
+                Модель выполнена в формате <strong>.glb</strong> и может быть просмотрена непосредственно на данной веб-странице
+                с использованием технологии <strong>WebGL</strong> и библиотеки <strong>Three.js</strong>.
+                Пользователь может вращать модель мышью, масштабировать колёсиком и перемещать правой кнопкой мыши.
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2026 Морозов Кирилл Артемович | ИСП-25 | 09.02.07 | ВАГПК, г. Воркута</p>
+    </footer>
+
+    <!-- THREE.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        (function() {
+            const container = document.getElementById('canvas-container');
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x12141e);
+
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(3, 3, 5);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            container.appendChild(renderer.domElement);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.rotateSpeed = 0.8;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.minDistance = 1;
+            controls.maxDistance = 15;
+
+            // Освещение
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 10, 7);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const directionalLight2 = new THREE.DirectionalLight(0x818cf8, 0.4);
+            directionalLight2.position.set(-5, 5, -5);
+            scene.add(directionalLight2);
+
+            const directionalLight3 = new THREE.DirectionalLight(0xa78bfa, 0.3);
+            directionalLight3.position.set(0, -3, 5);
+            scene.add(directionalLight3);
+
+            const pointLight = new THREE.PointLight(0x6366f1, 0.5, 20);
+            pointLight.position.set(0, 5, 0);
+            scene.add(pointLight);
+
+            // Пол
+            const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1d2e,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -1.5;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const gridHelper = new THREE.GridHelper(10, 20, 0x2a2d3e, 0x1e2030);
+            gridHelper.position.y = -1.49;
+            scene.add(gridHelper);
+
+            // Материал для перезаписи (опционально)
+            const mouseMaterial = new THREE.MeshStandardMaterial({
+                color: 0x6366f1,
+                roughness: 0.3,
+                metalness: 0.6,
+                side: THREE.DoubleSide
+            });
+
+            // === GLTF LOADER ===
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                'img/dz5.glb',
+                function(gltf) {
+                    const model = gltf.scene;
+
+                    // Центрирование и масштабирование
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 2.5 / maxDim;
+                    model.scale.set(scale, scale, scale);
+
+                    model.position.sub(center.multiplyScalar(scale));
+                    model.position.y += 0.3;
+
+                    // Проходим по всем мешам модели
+                    model.traverse(function(child) {
+                        if (child.isMesh) {
+                            // Пересчёт нормалей
+                            if (child.geometry) {
+                                child.geometry.computeVertexNormals();
+                            }
+
+                            // Включаем тени
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+
+                            // Раскомментируй строку ниже, если хочешь принудительно
+                            // применить свой материал вместо того, что зашит в glb
+                            // child.material = mouseMaterial.clone();
+                        }
+                    });
+
+                    scene.add(model);
+                    loadingOverlay.style.display = 'none';
+                },
+                function(xhr) {
+                    if (xhr.lengthComputable) {
+                        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                        loadingOverlay.querySelector('p').textContent = 'Загрузка: ' + percent + '%';
+                    }
+                },
+                function(error) {
+                    console.error('Ошибка загрузки модели:', error);
+                    loadingOverlay.querySelector('p').textContent = 'Ошибка загрузки. Проверьте img/dz5.glb';
+                    loadingOverlay.querySelector('.loader').style.display = 'none';
+                    createFallbackMouse();
+                }
+            );
+
+            // Fallback-модель если glb не загрузился
+            function createFallbackMouse() {
+                const group = new THREE.Group();
+
+                const bodyGeo = new THREE.SphereGeometry(1, 32, 32);
+                bodyGeo.scale(1, 0.5, 1.5);
+                const bodyMat = new THREE.MeshStandardMaterial({
+                    color: 0x6366f1,
+                    roughness: 0.3,
+                    metalness: 0.6
+                });
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                body.castShadow = true;
+                group.add(body);
+
+                const btnGeo = new THREE.SphereGeometry(0.45, 16, 16);
+                btnGeo.scale(1, 0.3, 1);
+                const btnMat = new THREE.MeshStandardMaterial({
+                    color: 0x818cf8,
+                    roughness: 0.2,
+                    metalness: 0.7
+                });
+                const leftBtn = new THREE.Mesh(btnGeo, btnMat);
+                leftBtn.position.set(-0.35, 0.35, -0.5);
+                group.add(leftBtn);
+
+                const rightBtn = new THREE.Mesh(btnGeo, btnMat);
+                rightBtn.position.set(0.35, 0.35, -0.5);
+                group.add(rightBtn);
+
+                const wheelGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
+                const wheelMat = new THREE.MeshStandardMaterial({
+                    color: 0x312e81,
+                    roughness: 0.5,
+                    metalness: 0.3
+                });
+                const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                wheel.rotation.x = Math.PI / 2;
+                wheel.position.set(0, 0.4, -0.3);
+                group.add(wheel);
+
+                const cableGeo = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
+                const cableMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+                const cable = new THREE.Mesh(cableGeo, cableMat);
+                cable.position.set(0, 0.1, 1.2);
+                cable.rotation.x = Math.PI / 4;
+                group.add(cable);
+
+                group.position.y = 0.3;
+                scene.add(group);
+                loadingOverlay.style.display = 'none';
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', function() {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        })();
+    </script>
+</body>
+</html>
